@@ -1,7 +1,11 @@
 from langdetect import detect
 import discord, requests, os, logging, json
 
-logging.basicConfig(filename="tl_bot_logs.log", encoding="utf-8", level=logging.DEBUG, format='%(asctime)s %(message)s')
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
+handler = logging.FileHandler('tl_bot_logs.log', 'w', 'utf-8')
+handler.setFormatter(logging.Formatter('%(asctime)s %(message)s'))
+logger.addHandler(handler)
 
 TOKEN = os.environ["DISCORD_TL_BOT_TOKEN"]
 client = discord.Client()
@@ -43,22 +47,22 @@ def translate(msg : str) -> str:
     resp = requests.post(translate_url, params=params)
     if resp.status_code != 200:
         if resp.status_code in error_codes:
-            logging.error(f"Status code {resp.status_code} : Translation of '{msg}' failed : {error_codes[resp.status_code]}")
+            logger.error(f"Status code {resp.status_code} : Translation of '{msg}' failed : {error_codes[resp.status_code]}")
         else:
-            logging.error(f"Status code {resp.status_code} : Translation of '{msg}' failed : Internal Server Error")
+            logger.error(f"Status code {resp.status_code} : Translation of '{msg}' failed : Internal Server Error")
     else:
         try:
             result_json = json.loads(resp.text)
             result = result_json["translations"][0]["text"]
-            logging.info(f"Status code {resp.status_code} : SUCCESS! Translated '{msg}' from source lang {source_lang} into {target_lang} : {result}")
+            logger.info(f"Status code {resp.status_code} : SUCCESS! Translated '{msg}' from source lang {source_lang} into {target_lang} : {result}")
             return result
         except Exception as ex:
-            logging.error(f"Status code {resp.status_code} : Translation of '{msg}' failed due to exception : {ex}")
+            logger.error(f"Status code {resp.status_code} : Translation of '{msg}' failed due to exception : {ex}")
     return None
 
 @client.event
 async def on_ready():
-    logging.info("Bot is online!")
+    logger.info("Bot is online!")
 
 @client.event
 async def on_message(msg):
