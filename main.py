@@ -3,7 +3,7 @@ import discord, requests, os, logging, json
 
 logging.basicConfig(filename="tl_bot_logs.log", encoding="utf-8", level=logging.DEBUG, format='%(asctime)s %(message)s')
 
-TOKEN = "OTYyMDQ1MTAxODIyMDUwMzc0.YlB0Ug.X7y4yngsu-0V89abDaR9aBQ84xU"
+TOKEN = os.environ["DISCORD_TL_BOT_TOKEN"]
 client = discord.Client()
 IDS = [
     962046744059846666, # Personal server TL channel
