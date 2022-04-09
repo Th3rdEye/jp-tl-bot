@@ -1,0 +1,4 @@
+discord~=1.7.3
+requests~=2.27.1
+langdetect~=1.0.9
+discord-py-slash-command~=3.0.3
