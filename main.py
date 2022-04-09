@@ -1,6 +1,8 @@
 from langdetect import detect
 import discord, requests, os, logging, json
-from discord.ext import commands
+from discord import Client, Intents
+from discord_slash import SlashCommand, SlashContext
+from discord_slash.utils.manage_commands import create_option
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -13,7 +15,9 @@ IDS = [
     962046744059846666, # Personal server TL channel
     759255638961422357 # Rice Anime Club Discord bot-commands
 ]
-Bot = commands.Bot(command_prefix="\\")
+
+client = Client(intents=Intents.default())
+Bot = SlashCommand(client)
 
 translate_url = "https://api-free.deepl.com/v2/translate"
 AUTH_KEY = os.environ["DEEPL_API_KEY"]
@@ -61,13 +65,20 @@ def translate(msg : str) -> str:
             logger.error(f"Status code {resp.status_code} : Translation of '{msg}' failed due to exception : {ex}")
     return None
 
-@Bot.command()
-async def tl(ctx, *args):
-    msg = translate(" ".join(args))
+@Bot.slash(name="tl", description="Translate between EN and JP.",options=[
+    create_option(
+        name="text",
+        description="The message to translate",
+        option_type=3,
+        required=True
+    )
+])
+async def tl(ctx: SlashContext, input: str):
+    msg = translate(" ".join(input))
     embed = discord.Embed(
         description = f"{msg}",
         colour = discord.Colour.from_rgb(255, 255, 255)
     )
     await ctx.send(embed=embed)
 
-Bot.run(TOKEN)
+client.run(TOKEN)
