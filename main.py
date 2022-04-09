@@ -3,13 +3,12 @@ import discord, requests, os, logging, json
 from discord.ext import commands
 
 logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 handler = logging.FileHandler('tl_bot_logs.log', 'w', 'utf-8')
 handler.setFormatter(logging.Formatter('%(asctime)s %(message)s'))
 logger.addHandler(handler)
 
 TOKEN = os.environ["DISCORD_TL_BOT_TOKEN"]
-client = discord.Client()
 IDS = [
     962046744059846666, # Personal server TL channel
     759255638961422357 # Rice Anime Club Discord bot-commands
@@ -61,10 +60,6 @@ def translate(msg : str) -> str:
         except Exception as ex:
             logger.error(f"Status code {resp.status_code} : Translation of '{msg}' failed due to exception : {ex}")
     return None
-
-@client.event
-async def on_ready():
-    logger.info("Bot is online!")
 
 @Bot.command()
 async def tl(ctx, *args):
