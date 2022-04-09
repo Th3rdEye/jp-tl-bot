@@ -1,5 +1,6 @@
 from langdetect import detect
 import discord, requests, os, logging, json
+from discord.ext import commands
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
@@ -13,6 +14,7 @@ IDS = [
     962046744059846666, # Personal server TL channel
     759255638961422357 # Rice Anime Club Discord bot-commands
 ]
+Bot = commands.Bot(command_prefix="\\")
 
 translate_url = "https://api-free.deepl.com/v2/translate"
 AUTH_KEY = os.environ["DEEPL_API_KEY"]
@@ -64,12 +66,13 @@ def translate(msg : str) -> str:
 async def on_ready():
     logger.info("Bot is online!")
 
-@client.event
-async def on_message(msg):
-    if msg.author == client.user:
-        return
-    
-    if msg.channel.id in IDS:
-        await msg.channel.send(translate(msg.content))
+@Bot.command()
+async def tl(ctx, *args):
+    msg = translate(" ".join(args))
+    embed = discord.Embed(
+        description = f"{msg}",
+        colour = discord.Colour.from_rgb(255, 255, 255)
+    )
+    await ctx.send(embed=embed)
 
-client.run(TOKEN)
+Bot.run(TOKEN)
